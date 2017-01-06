@@ -37,7 +37,7 @@ class ActivationService
         $link = route('user.activate', $token);
         $message = sprintf('Activate account <a href="%s">%s</a>', $link, $link);
 
-        $this->mailer->send($message, function (Message $m) use ($user) {
+        $this->mailer->raw($message, function (Message $m) use ($user) {
             $m->to((isset($this->overrideEmail) ? $this->overrideEmail : $user->email))->subject('KahootScores: New user activation');
         });
 
