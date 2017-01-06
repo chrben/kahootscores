@@ -10,13 +10,25 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/', 'LeaderboardController@displayLeaderboard');
-Route::get('/player/{contestant}', 'LeaderboardController@viewPlayer');
-Route::get('/drive', 'DriveController@listDriveContents');
-Route::get('/driveauth', 'DriveController@auth');
-Route::get('/oauth2callback', 'DriveController@authcallback');
-Route::get('/file/{file_id}', 'DriveController@singleFile');
-Route::get('/excel', 'ExcelController@showUploadForm');
-Route::post('/excel', 'ExcelController@uploadSheet');
-Route::get('/excel/edit/{quizRaw}', 'ExcelController@showEditForm');
-Route::post('/excel/edit', 'ExcelController@storeSheet');
+
+
+Route::group(['middleware' => ['web']], function () {
+    Route::get('/', 'LeaderboardController@displayLeaderboard');
+    Route::get('/player/{contestant}', 'LeaderboardController@viewPlayer');
+    Route::get('/drive', 'DriveController@listDriveContents');
+    Route::get('/driveauth', 'DriveController@auth');
+    Route::get('/oauth2callback', 'DriveController@authcallback');
+    Route::get('/file/{file_id}', 'DriveController@singleFile');
+    Route::get('/excel', 'ExcelController@showUploadForm');
+    Route::post('/excel', 'ExcelController@uploadSheet');
+    Route::get('/excel/edit/{quizRaw}', 'ExcelController@showEditForm');
+    Route::post('/excel/edit', 'ExcelController@storeSheet');
+    Route::get('/home', 'LeaderboardController@displayLeaderboard');
+});
+Auth::routes();
+Route::get('/logout', function() {
+    Auth::logout();
+    return redirect('/');
+});
+Route::get('user/activation/{token}', 'Auth\RegisterController@activateUser')->name('user.activate');
+

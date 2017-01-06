@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Input;
 
 class ExcelController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     public function showUploadForm(Request $request)
     {
         return view('excel.upload');
@@ -22,18 +26,17 @@ class ExcelController extends Controller
     public function uploadSheet(Request $request)
     {
         $rules = array(
-            'sheet' => 'required|file',
+            'sheet' => 'required|file|mimetypes:application/octet-stream|max:200',
         );
 
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails())
         {
-            return redirect('/drive')->withErrors($validator);
+            return redirect('/excel')->withErrors($validator);
         }
         else
         {
-            $data = Excel::load($request->file('sheet'), function ($reader) {
-            })->get();
+            $data = Excel::load($request->file('sheet'), function ($reader) {})->get();
 
             $quiz = new QuizRaw();
             foreach ($data->all()[0][0] as $key => $val)
@@ -72,11 +75,34 @@ class ExcelController extends Controller
             $results[$result->player]['total_time'] += $result->answer_time;
             $questionCount = $result->question_number > $questionCount ? $result->question_number : $questionCount;
         }
-        return view('excel.edit', ['results' => $results, 'questionCount' => $questionCount, 'quizname' => $quizRaw->name]);
+        $playerList = Contestant::pluck('name')->all();
+        return view('excel.edit', ['results' => $results, 'questionCount' => $questionCount, 'quizname' => $quizRaw->name, 'playerlist' => $playerList]);
     }
 
     public function storeSheet(Request $request)
     {
+        $rules = array(
+            'quizname' => 'required|min:4|max:255',
+            'author' => 'required|min:2|max:255',
+            'players.*.name' => 'required|min:2|max:255',
+        );
+        $messages = array(
+            'quizname.required' => 'This quiz needs a name!',
+            'quizname.min' => 'The given quiz name is way too short!',
+            'quizname.max' => 'The given quiz name is WAY too long!',
+            'author.required' => 'Author needs to be named!',
+            'author.min' => 'The given author name is way too short!',
+            'author.max' => 'The given author name is WAY too long!',
+            'players.*.name.required' => 'Player is missing a name!',
+            'players.*.name.min' => 'A player\'s name is way too short!',
+            'players.*.name.max' => 'A player\'s name is WAY too long!',
+        );
+
+        $validator = Validator::make($request->all(), $rules,  $messages);
+        if ($validator->fails())
+        {
+            return \Redirect::back()->withErrors($validator->errors())->withInput();
+        }
         $author = Contestant::where('name', ucwords($request->author))->first();
         if ($author == null)
         {

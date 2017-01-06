@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateQuizRawsTable extends Migration
+class CreateUserActivationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateQuizRawsTable extends Migration
      */
     public function up()
     {
-        Schema::create('quiz_raws', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name');
-            $table->integer('creator_id')->unsigned()->index();
-            $table->timestamps();
+        Schema::create('user_activations', function (Blueprint $table) {
+            $table->integer('user_id')->unsigned();
+            $table->string('token')->index();
+            $table->timestamp('created_at');
         });
     }
 
@@ -28,6 +27,6 @@ class CreateQuizRawsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('quiz_raws');
+        Schema::dropIfExists('user_activations');
     }
 }

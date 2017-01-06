@@ -10,6 +10,7 @@ class DriveController extends Controller
 
     public function __construct()
     {
+        $this->middleware('auth');
         $this->client = new \Google_Client();
         $this->client->setAuthConfig(storage_path() . '/drive/' . 'client_id.json');
         $this->client->addScope(\Google_Service_Sheets::SPREADSHEETS_READONLY);

@@ -1,6 +1,7 @@
 @extends('drive.template')
 
 @section('content')
+    <div class="content">
     {{ count($rows) }}
     <table>
         @foreach($rows as $row)
@@ -12,4 +13,5 @@
         @endforeach
     </table>
     <a href="{{ action('DriveController@listDriveContents') }}"><- back</a>
+    </div>
 @endsection

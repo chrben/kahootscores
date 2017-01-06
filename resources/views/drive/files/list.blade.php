@@ -1,6 +1,7 @@
 @extends('drive.template')
 
 @section('content')
+    <div class="content">
     {{ count($files_list) }}
     <table>
     @foreach($files_list as $file)
@@ -11,4 +12,5 @@
         </tr>
     @endforeach
     </table>
+    </div>
 @endsection
