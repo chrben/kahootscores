@@ -42,9 +42,8 @@ class LoginController extends Controller
     }
     public function authenticated(Request $request, $user)
     {
-        if (!$user->activated) {
-            $this->activationService->sendActivationMail($user);
-            auth()->logout();
+        if ($user->activated !== 1) {
+            $this->guard()->logout();
             return back()->with('warning', 'Your account has not yet been activated by an administrator. Access denied.');
         }
         return redirect()->intended($this->redirectPath());
