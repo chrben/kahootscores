@@ -56,6 +56,7 @@
                                 <input type="hidden" name="players[{{ $name }}][score_nostreak]" value="{{ $result['points_nostreak'] }}" />
                                 <input type="hidden" name="players[{{ $name }}][total_time]" value="{{ $result['total_time'] }}" />
                                 <input type="hidden" name="players[{{ $name }}][correct]" value="{{ $result['correct'] }}" />
+                                <input type="hidden" name="players[{{ $name }}][best_streak]" value="{{ $result['best_streak'] }}" />
                             </tr>
                         @endforeach
                     </table>

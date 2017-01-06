@@ -19,6 +19,7 @@ class CreateQuizResultsTable extends Migration
             $table->integer('correct_questions')->unsigned();
             $table->float('average_answer_time');
             $table->integer('score_nostreak');
+            $table->integer('best_streak');
             $table->integer('contestant_id')->unsigned()->index();
             $table->integer('quiz_id')->unsigned()->index();
             $table->timestamps();

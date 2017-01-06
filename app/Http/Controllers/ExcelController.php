@@ -70,11 +70,20 @@ class ExcelController extends Controller
         foreach($quizRaw->questions as $result)
         {
             if (!isset($results[$result->player]))
-                $results[$result->player] = array("correct" => 0, "points" => 0, "points_nostreak" => 0, "total_time" => 0.0);
+                $results[$result->player] = array("correct" => 0, "points" => 0, "points_nostreak" => 0, "total_time" => 0.0, 'best_streak' => 0, 'current_streak' => 0);
             $results[$result->player]['correct'] += ($result->correct ? 1 : 0);
             $results[$result->player]['points'] += $result->points;
             $results[$result->player]['points_nostreak'] += $result->points_nostreak;
             $results[$result->player]['total_time'] += $result->answer_time;
+
+            if ($result->correct) {
+                $results[$result->player]['current_streak'] += 1;
+                if ($results[$result->player]['current_streak'] > $results[$result->player]['best_streak'])
+                    $results[$result->player]['best_streak'] = $results[$result->player]['current_streak'];
+            } else {
+                $results[$result->player]['current_streak'] = 0;
+            }
+
             $questionCount = $result->question_number > $questionCount ? $result->question_number : $questionCount;
         }
         $playerList = Contestant::pluck('name')->all();
@@ -136,6 +145,7 @@ class ExcelController extends Controller
             $result->correct_questions = $playerdata['correct'];
             $result->average_answer_time = $playerdata['total_time'] / $quiz->question_count;
             $result->score_nostreak = $playerdata['score_nostreak'];
+            $result->best_streak = $playerdata['best_streak'];
             $result->contestant()->associate($contestant);
             $result->quiz()->associate($quiz);
             $result->save();

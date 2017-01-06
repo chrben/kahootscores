@@ -8411,4 +8411,35 @@ div.lb_place_3 {
   background-color: #0088cc;
 }
 
+/* player view */
+div.row.player-container {
+  width: 100%;
+}
+
+span.pv_streak_header, span.pv_aspa_header,
+span.pv_score_header, span.pv_accur_header {
+  font-size: .8em;
+}
+
+span.pv_streak_best, span.pv_aspa_current,
+span.pv_score_current, span.pv_accur_current {
+  font-size: 3.5em;
+  line-height: 1.2em;
+}
+
+span.pv_streak_global, span.pv_aspa_global,
+span.pv_score_global, span.pv_accur_global {
+  font-size: .6em;
+  color: #999999;
+}
+
+span.pv_bold {
+  font-weight: 400;
+}
+
+span.pv_aliases {
+  font-size: .8em;
+  color: #9c9c9c;
+}
+
 /*# sourceMappingURL=app.css.map */
