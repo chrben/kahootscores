@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Validator;
 use Illuminate\Support\Facades\Input;
+use Auth;
 
 class ExcelController extends Controller
 {
@@ -39,6 +40,7 @@ class ExcelController extends Controller
             $data = Excel::load($request->file('sheet'), function ($reader) {})->get();
 
             $quiz = new QuizRaw();
+            $quiz->creator()->associate(Auth::user());
             foreach ($data->all()[0][0] as $key => $val)
             {
                 $quiz->name = $key;
@@ -114,6 +116,7 @@ class ExcelController extends Controller
         $quiz = new \App\Quiz();
         $quiz->name = $request->quizname;
         $quiz->author()->associate($author);
+        $quiz->creator()->associate(Auth::user());
         $quiz->question_count = $request->question_count;
         $quiz->save();
         $data = $request->all();

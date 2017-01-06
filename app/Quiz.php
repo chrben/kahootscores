@@ -12,6 +12,10 @@ class Quiz extends Model
     }
     public function author()
     {
-        return $this->belongsTo(Contestant::class, 'creator_id');
+        return $this->belongsTo(Contestant::class, 'author_id');
+    }
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'creator_id');
     }
 }

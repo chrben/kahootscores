@@ -10,4 +10,8 @@ class QuizRaw extends Model
     {
         return $this->hasMany(QuizResultRaw::class, 'quiz_id');
     }
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'creator_id');
+    }
 }
