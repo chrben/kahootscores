@@ -95,7 +95,8 @@ class LeaderboardController extends Controller
     private function getASPALeaderboard()
     {
         return \App\Contestant::leftJoin('quiz_results', 'quiz_results.contestant_id', '=', 'contestants.id')
-            ->selectRaw('contestants.name, contestants.id, (sum(quiz_results.score)/sum(quiz_results.correct_questions)) as ASPA')
+            ->leftJoin('quizzes', 'quizzes.id', '=', 'quiz_results.quiz_id')
+            ->selectRaw('contestants.name, contestants.id, (sum(quiz_results.score)/sum(quizzes.question_count)) as ASPA')
             ->groupBy('contestants.id')
             ->orderBy('ASPA', 'desc')
             ->get();
