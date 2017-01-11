@@ -36,6 +36,15 @@ class LeaderboardController extends Controller
         $season = ($season===null ? null : Season::find($season));
         $accuracyData = $this->getAccuracyLeaderboard($season);
         $i = 0;
+        if (count($accuracyData) == 0)
+        {
+            return view('leaderboards.player', [
+                'contestant' => $contestant,
+                'dataMissing' => true,
+                'aliases' => $contestant->aliases->pluck('alias')->all(),
+                'season' => $season,
+            ]);
+        }
         foreach ($accuracyData as $entry) {
             $i++;
             $entry->placement = $i;
@@ -49,6 +58,15 @@ class LeaderboardController extends Controller
 
         $scoreData = $this->getLeaderboard($season);
         $i = 0;
+        if (count($scoreData) == 0)
+        {
+            return view('leaderboards.player', [
+                'contestant' => $contestant,
+                'dataMissing' => true,
+                'aliases' => $contestant->aliases->pluck('alias')->all(),
+                'season' => $season,
+            ]);
+        }
         foreach ($scoreData as $entry) {
             $i++;
             $entry->placement = $i;
@@ -62,6 +80,15 @@ class LeaderboardController extends Controller
 
         $streakData = $this->getStreakLeaderboard($season);
         $i = 0;
+        if (count($streakData) == 0)
+        {
+            return view('leaderboards.player', [
+                'contestant' => $contestant,
+                'dataMissing' => true,
+                'aliases' => $contestant->aliases->pluck('alias')->all(),
+                'season' => $season,
+            ]);
+        }
         foreach ($streakData as $entry) {
             $i++;
             $entry->placement = $i;
@@ -75,6 +102,15 @@ class LeaderboardController extends Controller
 
         $ASPAData = $this->getASPALeaderboard($season);
         $i = 0;
+        if (count($ASPAData) == 0)
+        {
+            return view('leaderboards.player', [
+                'contestant' => $contestant,
+                'dataMissing' => true,
+                'aliases' => $contestant->aliases->pluck('alias')->all(),
+                'season' => $season,
+            ]);
+        }
         foreach ($ASPAData as $entry) {
             $i++;
             $entry->placement = $i;

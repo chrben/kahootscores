@@ -9,6 +9,7 @@
                     <span class="pv_aliases">Also known as: {{ implode(', ', $aliases) }}</span>
                 </div>
             </div>
+            @if (!isset($dataMissing) || $dataMissing == false)
             <div class="row">
                 <div class="col-sm-4">
                     <div class="well">
@@ -125,6 +126,9 @@
                 <div class="col-sm-4">
                 </div>
             </div>
+            @else
+                <h4>Data is missing, unable to display stats for this season.</h4>
+            @endif
             <div class="row">
                 <div class="col-xs-12 text-center">
                     @if ($season !== null)
