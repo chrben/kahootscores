@@ -169,6 +169,8 @@ class ExcelController extends Controller
             $calias->result()->associate($result);
             $calias->save();
         }
-        return redirect()->action('LeaderboardController@displayLeaderboard');
+        if ($season !== null)
+            return redirect()->action('LeaderboardController@displayLeaderboard', $season);
+        return redirect()->action('LeaderboardController@redirectToCurrentSeason');
     }
 }

@@ -33,7 +33,7 @@ class LeaderboardController extends Controller
 
     public function viewPlayer(Request $request, $season, Contestant $contestant)
     {
-        $season = ($season===null?:Season::find($season)->first());
+        $season = ($season===null ? null : Season::find($season));
         $accuracyData = $this->getAccuracyLeaderboard($season);
         $i = 0;
         foreach ($accuracyData as $entry) {
