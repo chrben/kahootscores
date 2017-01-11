@@ -127,7 +127,11 @@
             </div>
             <div class="row">
                 <div class="col-xs-12 text-center">
-                    <a href="{{ action('LeaderboardController@displayLeaderboard') }}"> < back to leaderboard</a>
+                    @if ($season !== null)
+                        <a href="{{ action('LeaderboardController@displayLeaderboard', $season) }}"> < back to leaderboard</a>
+                    @else
+                        <a href="{{ action('LeaderboardController@displayAllSeasonsBoard') }}"> < back to leaderboard</a>
+                    @endif
                 </div>
             </div>
         </div>

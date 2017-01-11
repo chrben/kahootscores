@@ -18,4 +18,8 @@ class Quiz extends Model
     {
         return $this->belongsTo(User::class, 'creator_id');
     }
+    public function season()
+    {
+        return $this->belongsTo(Season::class, 'season_id');
+    }
 }

@@ -7,6 +7,7 @@ use App\ContestantAlias;
 use App\QuizRaw;
 use App\QuizResult;
 use App\QuizResultRaw;
+use App\Season;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Validator;
@@ -126,6 +127,18 @@ class ExcelController extends Controller
         $quiz->name = $request->quizname;
         $quiz->author()->associate($author);
         $quiz->creator()->associate(Auth::user());
+
+        if (!isset($request->season))
+        {
+            $season = Season::where('active', true)->orderBy('start', 'desc')->first();
+        }
+        else
+        {
+            $season = Season::find($request->season)->first();
+        }
+        if ($season != null)
+            $quiz->season()->associate($season);
+
         $quiz->question_count = $request->question_count;
         $quiz->save();
         $data = $request->all();

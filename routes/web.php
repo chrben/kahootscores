@@ -13,8 +13,11 @@
 
 
 Route::group(['middleware' => ['web']], function () {
-    Route::get('/', 'LeaderboardController@displayLeaderboard');
-    Route::get('/player/{contestant}', 'LeaderboardController@viewPlayer');
+    Route::get('/', 'LeaderboardController@redirectToCurrentSeason');
+    Route::get('/all', 'LeaderboardController@displayAllSeasonsBoard');
+    Route::get('/all/player-{contestant}', 'LeaderboardController@viewPlayerAllSeasons');
+    Route::get('/season-{season}', 'LeaderboardController@displayLeaderboard');
+    Route::get('/season-{season}/player-{contestant}', 'LeaderboardController@viewPlayer');
     Route::get('/drive', 'DriveController@listDriveContents');
     Route::get('/driveauth', 'DriveController@auth');
     Route::get('/oauth2callback', 'DriveController@authcallback');
@@ -23,7 +26,6 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('/excel', 'ExcelController@uploadSheet');
     Route::get('/excel/edit/{quizRaw}', 'ExcelController@showEditForm');
     Route::post('/excel/edit', 'ExcelController@storeSheet');
-    Route::get('/home', 'LeaderboardController@displayLeaderboard');
 });
 Auth::routes();
 Route::get('/logout', function() {
