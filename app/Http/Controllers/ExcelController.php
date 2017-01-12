@@ -73,17 +73,30 @@ class ExcelController extends Controller
             if (!isset($results[$result->player]))
                 $results[$result->player] = array("correct" => 0, "points" => 0, "points_nostreak" => 0, "total_time" => 0.0, 'best_streak' => 0, 'current_streak' => 0);
             $results[$result->player]['correct'] += ($result->correct ? 1 : 0);
-            $results[$result->player]['points'] += $result->points;
-            $results[$result->player]['points_nostreak'] += $result->points_nostreak;
             $results[$result->player]['total_time'] += $result->answer_time;
 
             if ($result->correct) {
                 $results[$result->player]['current_streak'] += 1;
                 if ($results[$result->player]['current_streak'] > $results[$result->player]['best_streak'])
                     $results[$result->player]['best_streak'] = $results[$result->player]['current_streak'];
+
+                if (($pointsWithStreak = $result->points_nostreak + (($results[$result->player]['current_streak'] - 1) * 100)) != $result->points)
+                {
+                    $results[$result->player]['points'] += $pointsWithStreak;
+                }
+                else
+                {
+                    $results[$result->player]['points'] += $result->points;
+                }
+
+                $results[$result->player]['points_nostreak'] += $result->points_nostreak;
             } else {
                 $results[$result->player]['current_streak'] = 0;
+                $results[$result->player]['points_nostreak'] += $result->points_nostreak;
+                $results[$result->player]['points'] += $result->points;
             }
+
+            // TODO: fiks streak score estimation, sjekk drive
 
             $questionCount = $result->question_number > $questionCount ? $result->question_number : $questionCount;
         }
