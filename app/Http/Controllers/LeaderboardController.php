@@ -128,7 +128,7 @@ class LeaderboardController extends Controller
             'aspa' => $aspa,
             'score' => $score,
             'accuracy' => $accuracy,
-            'aliases' => $contestant->aliases->pluck('alias')->all(),
+            'aliases' => $contestant->aliases->unique('alias')->pluck('alias')->all(),
             'season' => $season,
         ]);
     }

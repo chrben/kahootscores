@@ -8,7 +8,7 @@ class Contestant extends Model
 {
     public function authored()
     {
-        return $this->hasMany(Quiz::class, 'creator_id');
+        return $this->hasMany(Quiz::class, 'author_id');
     }
     public function results()
     {
