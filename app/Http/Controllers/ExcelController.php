@@ -88,7 +88,8 @@ class ExcelController extends Controller
             $questionCount = $result->question_number > $questionCount ? $result->question_number : $questionCount;
         }
         $playerList = Contestant::pluck('name')->all();
-        return view('excel.edit', ['results' => $results, 'questionCount' => $questionCount, 'quizname' => $quizRaw->name, 'playerlist' => $playerList]);
+        $seasons = Season::orderBy('start', 'desc')->get();
+        return view('excel.edit', ['results' => $results, 'questionCount' => $questionCount, 'quizname' => $quizRaw->name, 'playerlist' => $playerList, 'seasons' => $seasons]);
     }
 
     public function storeSheet(Request $request)

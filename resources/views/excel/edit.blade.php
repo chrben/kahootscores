@@ -13,7 +13,7 @@
                                 @else
                                     <div class="input-group">
                                         @endif
-                            <span class="input-group-addon">Quiz name</span>
+                            <span class="input-group-addon fixed-width-addon">Quiz name</span>
                             <input class="form-control" type="text" name="quizname" value="{{ old('quizname') }}"/>
                         </div>
                     </div>
@@ -23,8 +23,26 @@
                         @else
                             <div class="input-group">
                         @endif
-                            <span class="input-group-addon">Quiz author</span>
+                            <span class="input-group-addon fixed-width-addon">Quiz author</span>
                             <input class="form-control ac-names" type="text" name="author" value="{{ old('author') }}"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @if ($errors->has('season'))
+                            <div class="input-group has-error">
+                        @else
+                            <div class="input-group">
+                        @endif
+                            <span class="input-group-addon fixed-width-addon">Season</span>
+                            <select class="form-control" name="season">
+                                @foreach ($seasons as $season)
+                                    <option value="{{ $season->id }}" {{ $season->id === \App\Season::current()->id ? 'selected' : '' }}>Season {{ $season->id }}
+                                    @if ($season->active == false)
+                                        (inactive)
+                                    @endif
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <input type="hidden" name="question_count" value="{{ $questionCount }}" />
@@ -74,13 +92,20 @@
                     @endforeach
                 </div>
             @endif
+            <div class="alert alert-dismissible alert-info">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <strong>Heads up!</strong> All name fields use Autocomplete, please see if the name is present before entering something new to avoid duplicate player entries!
+            </div>
         </div>
     </div>
     <script>
         $(function() {
             var playerNames = {!! json_encode($playerlist) !!};
             $(".ac-names").autocomplete({
-                source: playerNames
+                source: playerNames,
+                minLength: 0
+            }).focus(function() {
+                $(this).trigger('keydown');
             });
         });
     </script>

@@ -190,7 +190,9 @@ div.lb_place_3 {
   color: #f3f0f0;
   background-color: #0088cc;
 }
-
+.input-group-addon.fixed-width-addon {
+  min-width: 8em;
+}
 .leaderboard-header h3 > a {
   color: #929292;
   font-family: "Raleway";

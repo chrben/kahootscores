@@ -11,7 +11,7 @@ class LeaderboardController extends Controller
 {
     public function redirectToCurrentSeason(Request $request)
     {
-        $season = Season::where('active', true)->orderBy('start','desc')->first();
+        $season = Season::current();
         if ($season !== null)
             return \Redirect::action('LeaderboardController@displayLeaderboard', ['season' => $season]);
         return \Redirect::action('LeaderboardController@displayAllSeasonsBoard');
