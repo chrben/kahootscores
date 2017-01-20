@@ -148,7 +148,7 @@ class ExcelController extends Controller
         }
         else
         {
-            $season = Season::find($request->season)->first();
+            $season = Season::find($request->season);
         }
         if ($season != null)
             $quiz->season()->associate($season);
