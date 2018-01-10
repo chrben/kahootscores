@@ -16,7 +16,7 @@ class CreateQuizRawsTable extends Migration
         Schema::create('quiz_raws', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->integer('creator_id')->unsigned()->index();
+            $table->string('creator_name');
             $table->timestamps();
         });
     }

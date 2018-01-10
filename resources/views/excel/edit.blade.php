@@ -5,7 +5,7 @@
         <div class="col-xs-12 col-md-8 col-md-offset-2">
             <div class="well-lg">
                 <form class="form-horizontal" method="post" action="{{ action('ExcelController@storeSheet') }}">
-                    <h3>Edit Kahoot Results - {{ $quizname }}</h3>
+                    <h3>Edit Kahoot Results - {{ $quiz->name }} - {{ $quiz->date->formatLocalized('%d %B %Y') }}</h3>
                     {!! csrf_field() !!}
                     <div class="form-group">
                         @if ($errors->has('quizname'))
@@ -14,38 +14,18 @@
                                     <div class="input-group">
                                         @endif
                             <span class="input-group-addon fixed-width-addon">Quiz name</span>
-                            <input class="form-control" type="text" name="quizname" value="{{ old('quizname') }}"/>
+                            <input class="form-control" type="text" name="quizname" value="{{ old('quizname') != '' ? old('quizname') : $quiz->name }}"/>
                         </div>
                     </div>
                     <div class="form-group">
-                        @if ($errors->has('author'))
-                            <div class="input-group has-error">
-                        @else
-                            <div class="input-group">
-                        @endif
-                            <span class="input-group-addon fixed-width-addon">Quiz author</span>
-                            <input class="form-control ac-names" type="text" name="author" value="{{ old('author') }}"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        @if ($errors->has('season'))
-                            <div class="input-group has-error">
-                        @else
-                            <div class="input-group">
-                        @endif
-                            <span class="input-group-addon fixed-width-addon">Season</span>
-                            <select class="form-control" name="season">
-                                @foreach ($seasons as $season)
-                                    <option value="{{ $season->id }}" {{ $season->id === \App\Season::current()->id ? 'selected' : '' }}>Season {{ $season->id }}
-                                    @if ($season->active == false)
-                                        (inactive)
-                                    @endif
-                                    </option>
-                                @endforeach
-                            </select>
+                        <div class="input-group">
+                            <span class="input-group-addon">Forfatter {{ $quiz->creator_name }} A.K.A.</span>
+                            <input class="form-control ac-names" type="text" name="creator_realname" value="{{ old('creator_realname') }}"/>
                         </div>
                     </div>
                     <input type="hidden" name="question_count" value="{{ $questionCount }}" />
+                    <input type="hidden" name="quizdate" value="{{ $quiz->date }}" />
+                    <input type="hidden" name="creator_name" value="{{ $quiz->creator_name }}" />
                     <table class="table">
                         <tr>
                             <th>name</th>

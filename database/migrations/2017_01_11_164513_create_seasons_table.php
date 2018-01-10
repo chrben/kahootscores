@@ -15,7 +15,6 @@ class CreateSeasonsTable extends Migration
     {
         Schema::create('seasons', function (Blueprint $table) {
             $table->increments('id');
-            $table->boolean('active')->default(false);
             $table->timestamp('start')->nullable()->default(null);
             $table->timestamp('end')->nullable()->default(null);
             $table->timestamps();

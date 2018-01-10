@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddSeasonField extends Migration
+class AlterQuizRawsAddDate extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddSeasonField extends Migration
      */
     public function up()
     {
-        Schema::table('quizzes', function (Blueprint $table) {
-            $table->integer('season_id')->unsigned()->index()->nullable()->default(null);
+        Schema::table('quiz_raws', function (Blueprint $table) {
+            $table->date('date');
         });
     }
 
@@ -25,8 +25,8 @@ class AddSeasonField extends Migration
      */
     public function down()
     {
-        Schema::table('quizzes', function (Blueprint $table) {
-            $table->dropColumn('season_id');
+        Schema::table('quiz_raws', function (Blueprint $table) {
+            $table->dropColumn('date');
         });
     }
 }

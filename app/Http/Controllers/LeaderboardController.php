@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Contestant;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Season;
 
@@ -139,7 +140,7 @@ class LeaderboardController extends Controller
             return \App\Contestant::leftJoin('quiz_results', 'quiz_results.contestant_id', '=', 'contestants.id')
                 ->leftJoin('quizzes', 'quiz_results.quiz_id', '=', 'quizzes.id')
                 ->selectRaw('contestants.name, contestants.id, max(quiz_results.best_streak) as streak')
-                ->where('quizzes.season_id', $season->id)
+                ->whereBetween('quizzes.date', [$season->start, ($season->end ? $season->end : Carbon::now())])
                 ->groupBy('contestants.id')
                 ->orderBy('streak', 'desc')
                 ->get();
@@ -157,7 +158,7 @@ class LeaderboardController extends Controller
             return \App\Contestant::leftJoin('quiz_results', 'quiz_results.contestant_id', '=', 'contestants.id')
                 ->leftJoin('quizzes', 'quiz_results.quiz_id', '=', 'quizzes.id')
                 ->selectRaw('contestants.name, contestants.id, sum(quiz_results.score) as score')
-                ->where('quizzes.season_id', $season->id)
+                ->whereBetween('quizzes.date', [$season->start, ($season->end ? $season->end : Carbon::now())])
                 ->groupBy('contestants.id')
                 ->orderBy('score', 'desc')
                 ->get();
@@ -175,7 +176,7 @@ class LeaderboardController extends Controller
             return \App\Contestant::leftJoin('quiz_results', 'quiz_results.contestant_id', '=', 'contestants.id')
                 ->leftJoin('quizzes', 'quizzes.id', '=', 'quiz_results.quiz_id')
                 ->selectRaw('contestants.name, contestants.id, (sum(quiz_results.score)/sum(quizzes.question_count)) as ASPA')
-                ->where('quizzes.season_id', $season->id)
+                ->whereBetween('quizzes.date', [$season->start, ($season->end ? $season->end : Carbon::now())])
                 ->groupBy('contestants.id')
                 ->orderBy('ASPA', 'desc')
                 ->get();
@@ -195,7 +196,7 @@ class LeaderboardController extends Controller
             return \App\Contestant::leftJoin('quiz_results', 'quiz_results.contestant_id', '=', 'contestants.id')
                 ->leftJoin('quizzes', 'quizzes.id', '=', 'quiz_results.quiz_id')
                 ->selectRaw('contestants.name, contestants.id, (sum(quiz_results.correct_questions)/sum(quizzes.question_count)) as accuracy')
-                ->where('quizzes.season_id', $season->id)
+                ->whereBetween('quizzes.date', [$season->start, ($season->end ? $season->end : Carbon::now())])
                 ->groupBy('contestants.id')
                 ->orderBy('accuracy', 'desc')
                 ->get();

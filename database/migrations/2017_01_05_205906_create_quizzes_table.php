@@ -19,6 +19,7 @@ class CreateQuizzesTable extends Migration
             $table->integer('question_count')->unsigned();
             $table->integer('creator_id')->unsigned()->index();
             $table->integer('author_id')->unsigned()->index();
+            $table->date('date');
             $table->timestamps();
         });
     }

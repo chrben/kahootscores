@@ -8,11 +8,14 @@ use App\QuizRaw;
 use App\QuizResult;
 use App\QuizResultRaw;
 use App\Season;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
 use Validator;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Storage;
 use Auth;
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ExcelController extends Controller
 {
@@ -26,9 +29,9 @@ class ExcelController extends Controller
     }
 
     public function uploadSheet(Request $request)
-    {
+    { // mimetypes:application/octet-stream|
         $rules = array(
-            'sheet' => 'required|file|mimetypes:application/octet-stream|max:200',
+            'sheet' => 'required|file|max:200',
         );
 
         $validator = Validator::make($request->all(), $rules);
@@ -38,25 +41,51 @@ class ExcelController extends Controller
         }
         else
         {
-            $data = Excel::load($request->file('sheet'), function ($reader) {})->get();
+            $path = Storage::putFile('temp_sheets', $request->file('sheet'));
+            $path = Storage::disk('local')->getAdapter()->getPathPrefix() . $path;
+
+            $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+            $reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($path);
+            $firstSheet = $spreadsheet->getSheet(0);
+            $lastSheet = $spreadsheet->getSheet($spreadsheet->getSheetCount()-1);
+
+            /*$out = '';
+            foreach ($spreadsheet->getWorksheetIterator() as $index => $worksheet) {
+                $out.= '<table>' . PHP_EOL;
+                foreach ($worksheet->getRowIterator() as $row) {
+                    $out.= '<tr>' . PHP_EOL;
+                    $cellIterator = $row->getCellIterator();
+                    $cellIterator->setIterateOnlyExistingCells(FALSE);
+                    foreach ($cellIterator as $cell) {
+                        $out.= '<td>' .
+                            $cell->getValue() .
+                            '</td>' . PHP_EOL;
+                    }
+                    $out.= '</tr>' . PHP_EOL;
+                }
+                $out.= '</table>' . PHP_EOL;
+            }
+            return $out;*/
+
+            $title = $firstSheet->getCell('A1');
+            $datePlayed = $firstSheet->getCell('B2');
+            $dateParsed = Carbon::parse($datePlayed);
+            $host = $firstSheet->getCell('B3');
 
             $quiz = new QuizRaw();
-            $quiz->creator()->associate(Auth::user());
-            foreach ($data->all()[0][0] as $key => $val)
-            {
-                $quiz->name = $key;
-                break;
-            }
+            $quiz->creator_name = $host;
+            $quiz->name = $title;
+            $quiz->date = $dateParsed->format('Y-m-d');
             $quiz->save();
-            foreach ($data[count($data)-1] as $answer)
-            {
+            for ($i = 2; $i <= $lastSheet->getHighestRow(); $i++) {
                 $result = new QuizResultRaw();
-                $result->question_number = $answer['question_number'];
-                $result->player = $answer['players'];
-                $result->correct = ($answer['score_points'] > 0);
-                $result->points = $answer['score_points'];
-                $result->points_nostreak = $answer['score_without_answer_streak_bonus_points'];
-                $result->answer_time = $answer['answer_time_seconds'];
+                $result->question_number = $lastSheet->getCellByColumnAndRow(1, $i);
+                $result->player = $lastSheet->getCellByColumnAndRow(9, $i);
+                $result->correct = ($lastSheet->getCellByColumnAndRow(11, $i) == 'Correct') ? 1 : 0;
+                $result->points = $lastSheet->getCellByColumnAndRow(14, $i);
+                $result->points_nostreak = $lastSheet->getCellByColumnAndRow(15, $i);
+                $result->answer_time = $lastSheet->getCellByColumnAndRow(18, $i);
                 $result->quiz()->associate($quiz);
                 $result->save();
             }
@@ -101,24 +130,19 @@ class ExcelController extends Controller
             $questionCount = $result->question_number > $questionCount ? $result->question_number : $questionCount;
         }
         $playerList = Contestant::pluck('name')->all();
-        $seasons = Season::orderBy('start', 'desc')->get();
-        return view('excel.edit', ['results' => $results, 'questionCount' => $questionCount, 'quizname' => $quizRaw->name, 'playerlist' => $playerList, 'seasons' => $seasons]);
+        return view('excel.edit', ['results' => $results, 'questionCount' => $questionCount, 'quiz' => $quizRaw, 'playerlist' => $playerList]);
     }
 
     public function storeSheet(Request $request)
     {
         $rules = array(
             'quizname' => 'required|min:4|max:255',
-            'author' => 'required|min:2|max:255',
             'players.*.name' => 'required|min:2|max:255',
         );
         $messages = array(
             'quizname.required' => 'This quiz needs a name!',
             'quizname.min' => 'The given quiz name is way too short!',
             'quizname.max' => 'The given quiz name is WAY too long!',
-            'author.required' => 'Author needs to be named!',
-            'author.min' => 'The given author name is way too short!',
-            'author.max' => 'The given author name is WAY too long!',
             'players.*.name.required' => 'Player is missing a name!',
             'players.*.name.min' => 'A player\'s name is way too short!',
             'players.*.name.max' => 'A player\'s name is WAY too long!',
@@ -129,30 +153,25 @@ class ExcelController extends Controller
         {
             return \Redirect::back()->withErrors($validator->errors())->withInput();
         }
-        $author = Contestant::where('name', ucwords($request->author))->first();
-        if ($author == null)
-        {
-            $author = new Contestant();
-            $author->name = ucwords($request->author);
-            $author->save();
+
+        $creator = Contestant::where('creator_name', $request->creator_name)->first();
+        if (!$creator) {
+            $creator = Contestant::where('name', ucwords($request->creator_realname))->first();
+            if (!$creator) {
+                $creator = Contestant::create([
+                    'creator_name' => $request->creator_name,
+                    'name' => ucwords($request->creator_realname),
+                ]);
+            } else {
+                $creator->creator_name = $request->creator_name;
+                $creator->save();
+            }
         }
 
         $quiz = new \App\Quiz();
         $quiz->name = $request->quizname;
-        $quiz->author()->associate($author);
-        $quiz->creator()->associate(Auth::user());
-
-        if (!isset($request->season))
-        {
-            $season = Season::where('active', true)->orderBy('start', 'desc')->first();
-        }
-        else
-        {
-            $season = Season::find($request->season);
-        }
-        if ($season != null)
-            $quiz->season()->associate($season);
-
+        $quiz->date = $request->quizdate;
+        $quiz->creator()->associate($creator);
         $quiz->question_count = $request->question_count;
         $quiz->save();
         $data = $request->all();
@@ -183,8 +202,6 @@ class ExcelController extends Controller
             $calias->result()->associate($result);
             $calias->save();
         }
-        if ($season !== null)
-            return redirect()->action('LeaderboardController@displayLeaderboard', $season);
-        return redirect()->action('LeaderboardController@redirectToCurrentSeason');
+        return redirect()->action('LeaderboardController@displayLeaderboard', $quiz->season());
     }
 }

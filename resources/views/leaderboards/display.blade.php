@@ -11,7 +11,7 @@
                 </div>
                 <div class="col-xs-6 text-center">
                     @if (isset($season) && $season !== null)
-                        <h1>Season {{ $season->id }}</h1>
+                        <h1>Season {{ $season->id }}</h1><span>({{ $season->start->formatLocalized('%d %B %Y') }} - {{ $season->end->subMinute()->formatLocalized('%d %B %Y') }})</span>
                     @else
                         <h1>All Seasons</h1>
                     @endif

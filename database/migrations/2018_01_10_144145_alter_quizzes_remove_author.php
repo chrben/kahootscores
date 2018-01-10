@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateContestantsTable extends Migration
+class AlterQuizzesRemoveAuthor extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,8 @@ class CreateContestantsTable extends Migration
      */
     public function up()
     {
-        Schema::create('contestants', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name')->default('');
-            $table->string('creator_name')->default('');
-            $table->timestamps();
+        Schema::table('quizzes', function (Blueprint $table) {
+            $table->dropColumn('author_id');
         });
     }
 
@@ -28,6 +25,8 @@ class CreateContestantsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('contestants');
+        Schema::table('quizzes', function (Blueprint $table) {
+            $table->integer('author_id')->unsigned()->index();
+        });
     }
 }
